@@ -1,7 +1,7 @@
 import express, { json } from 'express';
 import dotenv from 'dotenv';
 import { router } from './routes';
-import { initializeDB } from './db/dataSource';
+import AppDataSource from './db/dataSource';
 
 dotenv.config();
 
@@ -17,9 +17,14 @@ app.use(function (err: any, req: express.Request, res: express.Response, next: e
 
 app.use('/v1', router);
 
-initializeDB();
-
-const port = process.env.PORT || 3002;
-app.listen(port, () => {
-  console.log(`server is listening on port ${port}`);
-});
+AppDataSource.initialize()
+  .then((dataSource) => {
+    console.log(`Connected to database ${dataSource.options.database}`);
+    const port = process.env.PORT || 3002;
+    app.listen(port, () => {
+      console.log(`server is listening on port ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
