@@ -1,12 +1,17 @@
 FROM node:14.17.5-alpine
 
 WORKDIR /usr/src/app
-
 COPY package*.json ./
+COPY . .
 RUN npm install
 RUN npm run build
 
-COPY . .
-EXPOSE 3002
+## this is stage two , where the app actually runs
 
-CMD [ "npm", "start" ]
+FROM node:14.17.5-alpine
+
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install --only=production
+COPY --from=0 /usr/src/app/dist ./dist
+CMD npm start
