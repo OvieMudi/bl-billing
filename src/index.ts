@@ -2,6 +2,7 @@ import express, { json } from 'express';
 import dotenv from 'dotenv';
 import { router } from './routes';
 import AppDataSource from './db/dataSource';
+import { TransactionQueueListener } from './services/transactionQueueListener.service';
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ app.use(function (err: any, req: express.Request, res: express.Response, next: e
 });
 
 app.use('/v1', router);
+
+TransactionQueueListener.Listen();
 
 AppDataSource.initialize()
   .then((dataSource) => {
